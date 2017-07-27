@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta content='initial-scale=1,maximum-scale=1,user-scalable=no' name='viewport'>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+	<link href='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.css' rel='stylesheet'>
+	<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.39.0/mapbox-gl.css' rel='stylesheet'>
+	<link href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.1.0/mapbox-gl-geocoder.css' rel='stylesheet' type='text/css'>
+	<link href="glimpse.css" rel="stylesheet" type="text/css">
+	<title>Glimpse</title>
+</head>
+<body>
+	<!-- The map is rendered here (added in glimpse.js) -->
+    <div id='map'></div>
+    
+    <!-- Modal for warning messages -->
+	<div class="modal fade" id="warningModal" role="dialog" tabindex="-1">
+		<div class="modal-dialog custom-modal-size" role="dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title"><span id="statsTitle">Warning</span></h4>
+				</div>
+				<div class="modal-body"> 
+					<p id="messageModalText"></p>
+				</div>
+			</div>
+		</div>
+    </div>
+    
+    <!-- Modal for showing stats -->
+	<div class="modal fade" id="statsModal" role="dialog" tabindex="-1">
+		<div class="modal-dialog custom-modal-size" role="dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" id="modalTitle">Stats</h4>
+				</div>
+				<div class="modal-body clearfix">
+					<ul class="nav nav-tabs" role="tablist">
+						<li class="active" role="presentation">
+							<a aria-controls="overview" data-toggle="tab" href="#overview" role="tab">Overview</a>
+						</li>
+						<li role="presentation">
+							<a aria-controls="population" data-toggle="tab" href="#population" role="tab">Population</a>
+						</li>
+						<li role="presentation">
+							<a aria-controls="stats information" data-toggle="tab" href="#statsInfo" role="tab">Stat Info</a>
+						</li>
+					</ul>
+					<div class="tab-content">
+						<div class="tab-pane active" id="overview" role="tabpanel">
+							<ul class="list-group" id="overviewList"></ul>
+							<div hidden="" id="loadingMessage"><strong>Loading stats</strong> <img src="./Content/ajax-loader.gif"></div>
+							<div class="alert alert-danger" hidden="" id="overviewJobsError" role="alert">
+								<span aria-hidden="true" class="glyphicon glyphicon-exclamation-sign"></span> <span id="overviewJobsErrorMessage"></span>
+							</div>
+							<div class="alert alert-danger no-margin-alert" hidden="" id="overviewCensusError" role="alert">
+								<span aria-hidden="true" class="glyphicon glyphicon-exclamation-sign"></span> <span id="overviewCensusErrorMessage"></span>
+							</div>
+						</div>
+						<div class="tab-pane" id="population" role="tabpanel">
+							<ul class="list-group" id="popList"></ul>
+							<div hidden="" id="loadingMessagePop"><strong>Loading stats</strong> <img src="Content/ajax-loader.gif"></div>
+							<div class="alert alert-danger no-margin-alert" hidden="" id="populationError" role="alert">
+								<span aria-hidden="true" class="glyphicon glyphicon-exclamation-sign"></span> <span id="populationErrorMessage"></span>
+							</div>
+						</div>
+						<div class="tab-pane" id="statsInfo" role="tabpanel">
+							<p id="statsInfoMessage">
+                                Glimpse supports viewing stats for cities and states. 
+                                The job openings number is based off the current amount of jobs listed on <a href="http://www.glassdoor.com" target="_blank">Glassdoor</a> for the place being viewed. 
+                                The rest of the stats are from the <a href="https://www.census.gov/" target="_blank">United States Census Bureau</a> 
+                                and were gathered using the <a href="https://uscensusbureau.github.io/citysdk/" target="_blank">CitySDK</a> API.
+                                Most the stats are from 2014 but the population broken down by race stats may be more recent. Requests for the census data can 
+                                sometimes take up to 10 seconds due to the amount of data the CitySDK API must interact with. 
+                                There is a GitHub project for Glimpse <a href="https://github.com/Jacobhbbrd/Glimpse" target="_blank">here</a>.
+                                <br>
+                                <br>
+                                <img alt="united states census bureau" src="http://teamsubjectmatter.com/wp-content/uploads/2016/06/census_logo.png" height="45" width="100"> 
+                                <!-- Attribution required by Glassdoor for using their API -->
+                                <a href='https://www.glassdoor.com/index.htm' target="_blank"><img src='https://www.glassdoor.com/static/img/api/glassdoor_logo_80.png' title='Job Search'></a>
+                            </p>
+						</div>
+					</div>
+					<div class="alert alert-warning" hidden="" id="overviewWarning" role="alert">
+						Still getting data from the last city you tried to view. Please wait a few seconds and try again.
+					</div><button class="btn btn-primary pull-right" id="retryBtn" onclick="getStats()" type="button">Retry</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.js'>
+	</script> 
+	<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.39.0/mapbox-gl.js'>
+	</script> 
+	<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.1.0/mapbox-gl-geocoder.min.js'>
+	</script> 
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js">
+	</script> 
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js">
+	</script> 
+	<script src="https://cdn-geoweb.s3.amazonaws.com/terraformer/1.0.5/terraformer.min.js">
+	</script> 
+	<script src="https://cdn-geoweb.s3.amazonaws.com/terraformer-arcgis-parser/1.0.4/terraformer-arcgis-parser.min.js">
+	</script> 
+	<script src="https://code.jquery.com/jquery-1.12.4.min.js">
+	</script> 
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js">
+	</script> 
+	<script src="./Scripts/citysdk.js">
+	</script> 
+	<script src="./Scripts/census.citysdk.js">
+	</script>
+	<script src="./Scripts/Glimpse.js">
+	</script>
+</body>
+</html>
