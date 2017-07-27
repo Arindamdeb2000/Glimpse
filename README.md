@@ -19,6 +19,7 @@ Here are some helpful links for working with technologies used by Glimpse:
 ## Known Issues
 * There is an issue with loading census stats for many cities in Hawaii
 * Location search suggestions still include locations like businesses
+* Inconsistent behavior for Safari on iOS. Some people have encountered issues with only a white screen being shown and with Glassdoor jobs not loading for any place.
 
 ## TODO
 * Closing the popup for a place requires you to search for the place again to make the popup reappear. Need to figure out a nice way to handle this
