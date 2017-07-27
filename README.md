@@ -1,5 +1,5 @@
 # Glimpse
-Glimpse allows a user to search for a state or city in the United States and view statistic for the place such as current job listings on Glassdoor, rent cost, average age, population and more.
+Glimpse allows a user to search for a state or city in the United States and view statistic for the place such as current job listings on Glassdoor, rent cost, average age, population and more. There is a video demo [here](https://vid.me/DhOlB).
 
 ## Setup
 If you want to work with Glimpse, you will first need to acquire API keys from Glassdoor, Mapbox and the United States Census Bureau. Then you can download the project files and plug your keys into the code to get Glimpse working.
@@ -28,3 +28,4 @@ Here are some helpful links for working with technologies used by Glimpse:
 * Add ability to see how a place’s stats compare to the averages for the state or the entire country
 * Add pie chart to better show how the population breaks down into races
 * Use GeoJSON to draw boundaries and shade the area of the city or state being viewed
+* Reset active tab to overview if user closes the stats modal
